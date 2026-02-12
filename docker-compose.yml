@@ -1,0 +1,11 @@
+version: "3.8"
+
+services:
+  xray:
+    image: ghcr.io/xtls/xray-core:latest
+    container_name: xray
+    restart: unless-stopped
+    volumes:
+      - ./xray/config.json:/etc/xray/config.json
+    ports:
+      - "443:443" # Map host port 443 to container port 443
