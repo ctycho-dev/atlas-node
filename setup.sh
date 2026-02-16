@@ -12,6 +12,12 @@ if ! command -v docker &> /dev/null; then
     curl -fsSL https://get.docker.com | sh
 fi
 
+# Install ufw if needed
+if ! command -v ufw &> /dev/null; then
+    echo "🔥 Installing ufw firewall..."
+    apt update -qq && apt install -y ufw
+fi
+
 # Load .env if exists, otherwise generate
 if [ -f .env ]; then
     echo "📝 Using existing .env..."
@@ -28,7 +34,7 @@ if [ -f .env ]; then
 else
     echo "🔑 Generating keys..."
     UUID=$(uuidgen)
-    KEYS=$(docker run --rm ghcr.io/xtls/xray-core:latest xray x25519)
+    KEYS=$(docker run --rm ghcr.io/xtls/xray-core:latest x25519)
     REALITY_PRIVATE_KEY=$(echo "$KEYS" | grep "Private key" | awk '{print $3}')
     REALITY_PUBLIC_KEY=$(echo "$KEYS" | grep "Public key" | awk '{print $3}')
     SHORT_ID=$(openssl rand -hex 8)
@@ -67,6 +73,17 @@ EOF
 
 echo "✅ Config created!"
 
+# Configure firewall
+echo "🔥 Configuring firewall..."
+if command -v ufw &> /dev/null; then
+    ufw --force allow 22/tcp     # SSH (don't lock yourself out!)
+    ufw --force allow 443/tcp    # Xray
+    ufw --force enable
+    echo "✅ Firewall enabled (ports 22, 443)"
+else
+    echo "⚠️  ufw not found - install with: apt install -y ufw"
+fi
+
 # Start container
 echo "🚀 Starting Xray..."
 docker compose up -d
@@ -89,6 +106,4 @@ echo "Short ID:    $SHORT_ID"
 echo "SNI:         $REALITY_SERVER_NAMES"
 echo "Fingerprint: chrome"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo ""
-echo "🔥 Open firewall: sudo ufw allow 443/tcp"
 echo ""
