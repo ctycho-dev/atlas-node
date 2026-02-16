@@ -1,3 +1,9 @@
+# Environment variables (contains keys and secrets)
 .env
+
+# Generated config files
+xray/config.json
+
+# System files
 .DS_Store
 .claude
