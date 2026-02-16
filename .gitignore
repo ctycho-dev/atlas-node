@@ -3,6 +3,7 @@
 
 # Generated config files
 xray/config.json
+config.json
 
 # System files
 .DS_Store
