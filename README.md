@@ -8,7 +8,7 @@ Docker-based VPN node using Xray-core with VLESS + Reality protocol.
 
 ```bash
 cd /opt
-git clone -b dev https://github.com/ctycho-dev/atlas-node.git
+git clone https://github.com/ctycho-dev/atlas-node.git
 cd atlas-node
 chmod +x setup.sh
 ```
