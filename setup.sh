@@ -88,8 +88,8 @@ fi
 echo "🚀 Starting Xray..."
 docker compose up -d
 
-# Show client info
-SERVER_IP=$(curl -s ifconfig.me 2>/dev/null || echo "YOUR_SERVER_IP")
+# Show client info (use IPv4 for compatibility)
+SERVER_IP=$(curl -4 -s ifconfig.me 2>/dev/null || echo "YOUR_SERVER_IP")
 
 echo ""
 echo "╔══════════════════════════════════════════════════════════╗"
