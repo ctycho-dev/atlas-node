@@ -76,9 +76,9 @@ echo "✅ Config created!"
 # Configure firewall
 echo "🔥 Configuring firewall..."
 if command -v ufw &> /dev/null; then
-    ufw --force allow 22/tcp     # SSH (don't lock yourself out!)
-    ufw --force allow 443/tcp    # Xray
-    ufw --force enable
+    ufw allow 22/tcp     # SSH (don't lock yourself out!)
+    ufw allow 443/tcp    # Xray
+    yes | ufw enable
     echo "✅ Firewall enabled (ports 22, 443)"
 else
     echo "⚠️  ufw not found - install with: apt install -y ufw"
