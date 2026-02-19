@@ -104,7 +104,7 @@ app.post("/api/sync-credentials", validateApiSecret, async (req, res) => {
 
     // Restart Xray container to apply changes
     exec(
-      "docker-compose restart xray",
+      "docker compose restart xray || docker-compose restart xray",
       { cwd: path.dirname(__dirname) },
       (error, stdout, stderr) => {
         if (error) {
