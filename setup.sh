@@ -29,8 +29,8 @@ if [ -f .env ]; then
         exit 1
     fi
 
-    REALITY_DEST=${REALITY_DEST:-www.microsoft.com:443}
-    REALITY_SERVER_NAMES=${REALITY_SERVER_NAMES:-www.microsoft.com}
+    REALITY_DEST=${REALITY_DEST:-www.github.com:443}
+    REALITY_SERVER_NAMES=${REALITY_SERVER_NAMES:-www.github.com}
 else
     echo "🔑 Generating keys..."
     UUID=$(uuidgen)
@@ -38,8 +38,8 @@ else
     REALITY_PRIVATE_KEY=$(echo "$KEYS" | grep "PrivateKey" | awk '{print $2}')
     REALITY_PUBLIC_KEY=$(echo "$KEYS" | grep "Password" | awk '{print $2}')
     SHORT_ID=$(openssl rand -hex 8)
-    REALITY_DEST=${REALITY_DEST:-www.microsoft.com:443}
-    REALITY_SERVER_NAMES=${REALITY_SERVER_NAMES:-www.microsoft.com}
+    REALITY_DEST=${REALITY_DEST:-www.github.com:443}
+    REALITY_SERVER_NAMES=${REALITY_SERVER_NAMES:-www.github.com}
 fi
 
 # Write config.json
