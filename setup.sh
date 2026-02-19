@@ -104,34 +104,56 @@ docker compose up -d
 # Show setup info
 SERVER_IP=$(curl -4 -s ifconfig.me 2>/dev/null || echo "YOUR_SERVER_IP")
 
+# Prompt for node name and API secret
+echo ""
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+read -p "Enter a name for this node (e.g., 'Server 1 DE'): " NODE_NAME
+echo ""
+echo "Generating API_SECRET..."
+API_SECRET=$(openssl rand -hex 32)
+
+# Update .env with API_SECRET
+sed -i.bak "s|^API_SECRET=.*|API_SECRET=$API_SECRET|" .env
+echo "✅ API_SECRET added to .env"
+
+# Generate registration token
+NODE_JSON=$(cat <<EOJSON
+{
+  "name": "$NODE_NAME",
+  "host": "$SERVER_IP",
+  "port": 443,
+  "reality_public_key": "$REALITY_PUBLIC_KEY",
+  "reality_short_ids": ["$SHORT_ID"],
+  "server_names": ["$REALITY_SERVER_NAMES"],
+  "api_secret": "$API_SECRET"
+}
+EOJSON
+)
+
+REGISTRATION_TOKEN=$(echo -n "$NODE_JSON" | base64 | tr -d '\n')
+
 echo ""
 echo "╔══════════════════════════════════════════════════════════╗"
 echo "║              ✅ Atlas Node Setup Complete!               ║"
 echo "╚══════════════════════════════════════════════════════════╝"
 echo ""
-echo "📋 Node Registration Details:"
-echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo "Server IP:    $SERVER_IP"
-echo "Public Key:   $REALITY_PUBLIC_KEY"
-echo "Short ID:     $SHORT_ID"
-echo "Server Names: $REALITY_SERVER_NAMES"
-echo "Destination:  $REALITY_DEST"
+echo "📋 Registration Token:"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo ""
-echo "⚠️  IMPORTANT: Complete these steps:"
+echo "$REGISTRATION_TOKEN"
 echo ""
-echo "1. Add API_SECRET to .env file:"
-echo "   nano .env"
-echo "   API_SECRET=\$(openssl rand -hex 32)"
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo ""
-echo "2. Start the containers:"
+echo "⚠️  NEXT STEPS:"
+echo ""
+echo "1. Start the agent container:"
 echo "   docker compose up -d"
 echo ""
-echo "3. Verify agent is running:"
+echo "2. Verify agent is running:"
 echo "   curl http://localhost:3000/health"
 echo ""
-echo "4. Register this node in Atlas Control using /admin_add_node"
-echo "   Use the details above when prompted"
+echo "3. Register this node in Atlas Control Telegram bot:"
+echo "   Send: /admin_add_node $REGISTRATION_TOKEN"
 echo ""
 echo "🚀 After registration, users can create VPNs via Telegram!"
 echo ""

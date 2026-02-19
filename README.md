@@ -22,23 +22,10 @@ The script will:
 - Create Xray configuration with empty clients array
 - Open required ports (22, 443, 3000)
 - Start Xray container
-- Display node registration details
+- Prompt for node name and generate API secret
+- Display registration token
 
-**2. Add API Secret:**
-
-The setup script creates `.env` with Reality keys. Now add the API secret:
-
-```bash
-nano .env
-```
-
-Add this line at the bottom:
-
-```env
-API_SECRET=your_generated_secret_here  # Generate with: openssl rand -hex 32
-```
-
-**3. Start all services:**
+**2. Start all services:**
 
 ```bash
 docker compose up -d
@@ -46,22 +33,20 @@ docker compose up -d
 
 This starts both Xray and the Node Agent.
 
-**4. Verify Agent is running:**
+**3. Verify Agent is running:**
 
 ```bash
 curl http://localhost:3000/health
 # Should return: {"status":"healthy","timestamp":"..."}
 ```
 
-**5. Register this node in Atlas Control:**
+**4. Register this node in Atlas Control:**
 
-Use the Telegram bot command `/admin_add_node` and enter the details shown by setup.sh (or from `.env`):
+Copy the registration token shown by setup.sh and send it to the Telegram bot:
 
-- **HOST:** Your server IP
-- **PUBLIC_KEY:** From `.env` → `REALITY_PUBLIC_KEY`
-- **SHORT_IDS:** From `.env` → `SHORT_ID` (as array: `["your_short_id"]`)
-- **SERVER_NAMES:** From `.env` → `REALITY_SERVER_NAMES` (as array)
-- **API_SECRET:** From `.env` → `API_SECRET`
+```
+/admin_add_node YOUR_REGISTRATION_TOKEN_HERE
+```
 
 After registration, users can create VPN configs via Telegram!
 
