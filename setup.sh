@@ -70,6 +70,9 @@ echo "📝 Writing config.json..."
 cat > xray/config.json << EOF
 {
   "log": {"loglevel": "warning"},
+  "dns": {
+    "servers": ["1.1.1.1", "8.8.8.8"]
+  },
   "inbounds": [{
     "port": 443,
     "protocol": "vless",
@@ -88,9 +91,13 @@ cat > xray/config.json << EOF
         "privateKey": "$REALITY_PRIVATE_KEY",
         "shortIds": ["$SHORT_ID"]
       }
+    },
+    "sniffing": {
+      "enabled": true,
+      "destOverride": ["http", "tls"]
     }
   }],
-  "outbounds": [{"protocol": "freedom"}]
+  "outbounds": [{"protocol": "freedom", "settings": {"domainStrategy": "UseIP"}}]
 }
 EOF
 

@@ -14,10 +14,11 @@ services:
     container_name: atlas-node-agent
     restart: unless-stopped
     working_dir: /app
-    command: sh -c "npm install && npm start"
+    command: sh -c "apk add --no-cache docker-cli && npm install && npm start"
     volumes:
       - ./agent:/app
       - ./xray:/xray
+      - /var/run/docker.sock:/var/run/docker.sock
     ports:
       - "3000:3000"
     # Environment variables loaded from .env file in root directory

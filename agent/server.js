@@ -102,24 +102,20 @@ app.post("/api/sync-credentials", validateApiSecret, async (req, res) => {
       });
     }
 
-    // Restart Xray container to apply changes
-    exec(
-      "docker compose restart xray || docker-compose restart xray",
-      { cwd: path.dirname(__dirname) },
-      (error, stdout, stderr) => {
-        if (error) {
-          console.error(
-            `[${new Date().toISOString()}] Failed to restart Xray:`,
-            error.message,
-          );
-          // Don't fail the request - config is updated, restart might work on next attempt
-        } else {
-          console.log(
-            `[${new Date().toISOString()}] Xray container restarted successfully`,
-          );
-        }
-      },
-    );
+    // Restart Xray container to apply changes (uses Docker socket mounted in this container)
+    exec("docker restart xray", {}, (error, stdout, stderr) => {
+      if (error) {
+        console.error(
+          `[${new Date().toISOString()}] Failed to restart Xray:`,
+          error.message,
+        );
+        // Don't fail the request - config is updated, restart might work on next attempt
+      } else {
+        console.log(
+          `[${new Date().toISOString()}] Xray container restarted successfully`,
+        );
+      }
+    });
 
     res.json({
       success: true,
