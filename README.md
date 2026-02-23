@@ -107,8 +107,8 @@ nano .env  # Edit after setup.sh creates it
 REALITY_PRIVATE_KEY=xxx
 REALITY_PUBLIC_KEY=xxx
 SHORT_ID=xxx
-REALITY_DEST=www.github.com:443
-REALITY_SERVER_NAMES=www.github.com
+REALITY_DEST=www.microsoft.com:443
+REALITY_SERVER_NAMES=www.microsoft.com
 
 # API Secret (add this manually after setup.sh completes)
 API_SECRET=your_secure_random_secret_here
