@@ -34,8 +34,18 @@ if [ -f .env ]; then
 else
     echo "🔑 Generating Reality keys..."
     KEYS=$(docker run --rm ghcr.io/xtls/xray-core:latest x25519)
-    REALITY_PRIVATE_KEY=$(echo "$KEYS" | grep "PrivateKey" | awk '{print $2}')
-    REALITY_PUBLIC_KEY=$(echo "$KEYS" | grep "Password" | awk '{print $2}')
+    # Handle both old/new xray output formats, e.g.:
+    # - "Private key: xxx" / "Public key: yyy"
+    # - "PrivateKey: xxx" / "PublicKey: yyy"
+    REALITY_PRIVATE_KEY=$(echo "$KEYS" | awk -F': *' '/Private[ _]?key|PrivateKey/{print $2; exit}')
+    REALITY_PUBLIC_KEY=$(echo "$KEYS" | awk -F': *' '/Public[ _]?key|PublicKey/{print $2; exit}')
+
+    if [ -z "$REALITY_PRIVATE_KEY" ] || [ -z "$REALITY_PUBLIC_KEY" ]; then
+        echo "❌ Failed to parse Reality keys from xray output:"
+        echo "$KEYS"
+        exit 1
+    fi
+
     SHORT_ID=$(openssl rand -hex 8)
     REALITY_DEST=${REALITY_DEST:-www.github.com:443}
     REALITY_SERVER_NAMES=${REALITY_SERVER_NAMES:-www.github.com}
@@ -91,8 +101,9 @@ echo "🔥 Configuring firewall..."
 if command -v ufw &> /dev/null; then
     ufw allow 22/tcp     # SSH (don't lock yourself out!)
     ufw allow 443/tcp    # Xray
+    ufw allow 3000/tcp   # Atlas Node agent API (restrict to Atlas Control IP later)
     yes | ufw enable
-    echo "✅ Firewall enabled (ports 22, 443)"
+    echo "✅ Firewall enabled (ports 22, 443, 3000)"
 else
     echo "⚠️  ufw not found - install with: apt install -y ufw"
 fi
